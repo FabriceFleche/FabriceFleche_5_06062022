@@ -1,4 +1,4 @@
-//Recuperation de l id du produit
+/*//Recuperation de l id du produit
 let idCanap = window.location.href;
 let url = new URL (idCanap);
 let refId = url.searchParams.get("id");
@@ -6,26 +6,13 @@ let refId = url.searchParams.get("id");
 // Recuperation de l url du produit selectione
 urlProduct = "http://localhost:3000/api/products/"+refId
 
-function productUrl (url) {
-fetch(url)
+fetch(urlProduct)
     .then(function(res) {
       if (res.ok) {
         return res.json();
-        }
+    }
     })
-    .then(function(detailCanape) {
-      console.log(detailCanape);
-      displayDetailCanape(detailCanape);
-    })
-
-    .catch(function(err) {
-      console.log("erreur : " + err)
-      alert("erreur : " + err)
-    });
-}
-
-
-    function displayDetailCanape (urlProduct) {
+    .then ((urlProduct) => {
       // Test de recuperation de l url du canape
       console.log(urlProduct.name);
       document.getElementById("title").innerHTML = urlProduct.name;
@@ -43,15 +30,12 @@ fetch(url)
         productColors.value = couleur;
         productColors.innerText = couleur;
         colors.appendChild(productColors);
-      }
     }
-
-      productUrl("http://localhost:3000/api/products/"+refId)
+    })
     
-    
+    .catch(function(err) {
+      console.log("erreur : " + err)
+      alert("erreur : " + err)
+    });
 
-    
-
-
-
-
+    console.log(urlProduct);*/
