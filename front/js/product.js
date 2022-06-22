@@ -54,21 +54,19 @@ const bouton = document.getElementById("addToCart");
 bouton.addEventListener("click", recupSaisieCanap);
 
 function recupSaisieCanap() {
-  
-//Stockage de l ID du canape selectionne
-localStorage.setItem('id',refId);
+  //Stockage de l ID du canape selectionne
+  localStorage.setItem('id',refId);
 
-//Recuperation et stockage de la couleur
-var option = document.getElementById('colors').value;
-localStorage.setItem('couleur',option);
+  //Recuperation et stockage de la couleur
+  var option = document.getElementById('colors').value;
+  localStorage.setItem('couleur',option);
 
-// Recuperation et stockage de la quantite
-var input = document.getElementById("quantity").value;
-localStorage.setItem('quantite',input);
+  //Recuperation et stockage de la quantite
+  var input = document.getElementById("quantity").value;
+  localStorage.setItem('quantite',input);
 
-//Validation des elements stockes dans localStorage
-console.log(localStorage);
-    
+  //Validation des elements stockes dans localStorage
+  console.log(localStorage);
 }
 
 
