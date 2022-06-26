@@ -2,7 +2,10 @@
 let cartQuantite = localStorage.getItem("quantite");
 console.log(cartQuantite);
 
-document.getElementsByName("itemQuantity").innerHTML = cartQuantite;
+//Recuperation de la couleur selectionnée
+let cartCouleur = localStorage.getItem("couleur");
+console.log(cartCouleur);
+
 
 //Recupération de l ID du canape selectionné
 let cartId = localStorage.getItem("id");
@@ -31,28 +34,31 @@ function cartProductUrl (url) {
     }
 
 // fonction affichage des infos du canape selectionne
-function displayCartDetailCanape (cartUrlProduct) {
+function displayCartDetailCanape (cartProduct) {
     // Test de recuperation du nom pour le canape
-    console.log(cartUrlProduct.name);
+    console.log(cartProduct.name);
     let article = document.createElement("article");
-    h2.appendChild(article);
+    cartCanap.appendChild(article);
+
     let titre = document.createElement("h2");
-    titre.textContent = cartUrlProduct.name;
+    titre.textContent = cartProduct.name;
     article.appendChild(titre);
-    //document.getElementById("title").innerHTML = cartUrlProduct.name;
-    //document.getElementById("price").innerHTML = cartUrlProduct.price;
-            
-    //productImage = document.getElementsByClassName("item__img")[0];
-    //let image = document.createElement("img");
-    //image.src = cartUrlProduct.imageUrl;
-    //image.alt = cartUrlProduct.altTxt;
-    //productImage.appendChild(image);
+
+    let couleurcanapselec = document.createElement("p");
+    couleurcanapselec.textContent = cartCouleur;
+    article.appendChild(couleurcanapselec);
+    
+    let prix = document.createElement("p");
+    prix.textContent = `${cartProduct.price} €`;
+    article.appendChild(prix);    
+                
+    cartImg = document.getElementsByClassName("cart__item__img")[0];
+    let image = document.createElement("img");
+    image.src = cartProduct.imageUrl;
+    image.alt = cartProduct.altTxt;
+    cartImg.appendChild(image);
 }
 
 cartProductUrl(cartUrlProduct);
+let cartCanap = document.querySelector(".cart__item__content__description");
 
-//let qte = document.getElementsByName("itemQuantity");
-//console.log(qte);
-
-//'${localStorage.getItem("quantite")}';
-//itemQuantity.textContent = '${localStorage.getItem("quantite")}';

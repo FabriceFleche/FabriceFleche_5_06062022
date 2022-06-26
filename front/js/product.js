@@ -26,20 +26,20 @@ fetch(url)
 }
 
 // fonction affichage des infos du canape selectionne
-function displayDetailCanape (urlProduct) {
+function displayDetailCanape (Product) {
   // Test de recuperation du nom pour le canape
-  console.log(urlProduct.name);
-  document.getElementById("title").innerHTML = urlProduct.name;
-  document.getElementById("price").innerHTML = urlProduct.price;
-  document.getElementById("description").innerHTML = urlProduct.description;
+  console.log(Product.name);
+  document.getElementById("title").innerHTML = Product.name;
+  document.getElementById("price").innerHTML = Product.price;
+  document.getElementById("description").innerHTML = Product.description;
       
   productImage = document.getElementsByClassName("item__img")[0];
   let image = document.createElement("img");
-  image.src = urlProduct.imageUrl;
-  image.alt = urlProduct.altTxt;
+  image.src = Product.imageUrl;
+  image.alt = Product.altTxt;
   productImage.appendChild(image);
 
-  for (let couleur of urlProduct.colors) {
+  for (let couleur of Product.colors) {
     let productColors = document.createElement("option");
     productColors.value = couleur;
     productColors.text = couleur;
@@ -49,10 +49,11 @@ function displayDetailCanape (urlProduct) {
 
 productUrl(urlProduct)
 
+//gestion du bouton ajouter au panier
+const boutonProduct = document.getElementById("addToCart");
+boutonProduct.addEventListener("click", recupSaisieCanap);
 
-const bouton = document.getElementById("addToCart");
-bouton.addEventListener("click", recupSaisieCanap);
-
+//fonction récuperation des donnees saisies
 function recupSaisieCanap() {
   //Stockage de l ID du canape selectionne
   localStorage.setItem('id',refId);
@@ -70,4 +71,19 @@ function recupSaisieCanap() {
 }
 
 
+/*let produiEnregistreDansLocalStorage = JSON.parse(localStorage.getItem("recupSaisieCanap"));
 
+//Si le produit est deja dans le localstorage
+if(produiEnregistreDansLocalStorage){
+  produiEnregistreDansLocalStorage.push(localStorage);
+  localStorage.setItem("recupSaisieCanap",JSON.stringify(produiEnregistreDansLocalStorage));
+}
+//Si le produit n'est pas dans le localstorage
+else {
+  produiEnregistreDansLocalStorage = new Array;
+  produiEnregistreDansLocalStorage.push(localStorage);
+  localStorage.setItem("recupSaisieCanap",JSON.stringify(produiEnregistreDansLocalStorage));
+};
+
+console.table(produiEnregistreDansLocalStorage);
+*/
