@@ -53,37 +53,36 @@ productUrl(urlProduct)
 const boutonProduct = document.getElementById("addToCart");
 boutonProduct.addEventListener("click", recupSaisieCanap);
 
+let cartArray = JSON.parse(localStorage.getItem('selectProducts'));
+
+
 //fonction récuperation des donnees saisies
 function recupSaisieCanap() {
   //Stockage de l ID du canape selectionne
-  localStorage.setItem('id',refId);
-
-  //Recuperation et stockage de la couleur
-  var option = document.getElementById('colors').value;
-  localStorage.setItem('couleur',option);
-
-  //Recuperation et stockage de la quantite
-  var input = document.getElementById("quantity").value;
-  localStorage.setItem('quantite',input);
-
-  //Validation des elements stockes dans localStorage
-  console.log(localStorage);
+  var optionColor = document.getElementById('colors').value;
+  var inputQuantity = document.getElementById("quantity").value;
+  let selectProduct = {
+    id : refId,
+    quantite : inputQuantity,
+    couleur : optionColor,
+  }
+if (cartArray == null) {
+  let cartArray = [];
+  cartArray.push(selectProduct);
+  localStorage.setItem('selectProducts',JSON.stringify(cartArray));
 }
-
-
-/*let produiEnregistreDansLocalStorage = JSON.parse(localStorage.getItem("recupSaisieCanap"));
-
-//Si le produit est deja dans le localstorage
-if(produiEnregistreDansLocalStorage){
-  produiEnregistreDansLocalStorage.push(localStorage);
-  localStorage.setItem("recupSaisieCanap",JSON.stringify(produiEnregistreDansLocalStorage));
-}
-//Si le produit n'est pas dans le localstorage
 else {
-  produiEnregistreDansLocalStorage = new Array;
-  produiEnregistreDansLocalStorage.push(localStorage);
-  localStorage.setItem("recupSaisieCanap",JSON.stringify(produiEnregistreDansLocalStorage));
-};
-
-console.table(produiEnregistreDansLocalStorage);
-*/
+  if (selectProduct.id === cartArray.id && selectProduct.couleur === cartArray.couleur) {
+    let quantiteAjoute = parseInt(selectProduct.quantite) + parseInt(inputQuantity);
+    selectProduct.quantite=quantiteAjoute;
+    cartArray.push(selectProduct);
+    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+  }
+  else {
+    cartArray.push(selectProduct);
+    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+    
+  }
+}
+}
+console.log(cartArray);
