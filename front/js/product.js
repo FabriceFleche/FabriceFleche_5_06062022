@@ -49,9 +49,7 @@ function displayDetailCanape (Product) {
 
 productUrl(urlProduct)
 
-//gestion du bouton ajouter au panier
-const boutonProduct = document.getElementById("addToCart");
-boutonProduct.addEventListener("click", recupSaisieCanap);
+
 
 let cartArray = JSON.parse(localStorage.getItem('selectProducts'));
 
@@ -63,26 +61,31 @@ function recupSaisieCanap() {
   var inputQuantity = document.getElementById("quantity").value;
   let selectProduct = {
     id : refId,
-    quantite : inputQuantity,
+    quantite : parseInt(inputQuantity),
     couleur : optionColor,
   }
+  //Creation d'un tableau si c'est le 1er canape place dans le panier
 if (cartArray == null) {
   let cartArray = [];
   cartArray.push(selectProduct);
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
 }
+  //Si rajout du meme canape dans le panier, ajout des quantites
+else if (cartArray.find((item) => item.id === refId && item.couleur == optionColor))
+  cartArray.map((objet) => {
+  if (objet.id == refId && objet.couleur == optionColor) {
+    objet.quantite += parseInt(inputQuantity);
+    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+}})
 else {
-  if (selectProduct.id === cartArray.id && selectProduct.couleur === cartArray.couleur) {
-    let quantiteAjoute = parseInt(selectProduct.quantite) + parseInt(inputQuantity);
-    selectProduct.quantite=quantiteAjoute;
-    cartArray.push(selectProduct);
-    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
-  }
-  else {
-    cartArray.push(selectProduct);
-    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
-    
+  cartArray.push(selectProduct);
+  localStorage.setItem('selectProducts',JSON.stringify(cartArray));
   }
 }
-}
-console.log(cartArray);
+
+//gestion du bouton ajouter au panier
+const boutonProduct = document.getElementById("addToCart");
+boutonProduct.addEventListener("click", recupSaisieCanap);
+
+//console.log(cartArray);
+console.log(JSON.parse(localStorage.getItem('selectProducts')));
