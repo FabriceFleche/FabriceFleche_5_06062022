@@ -1,20 +1,12 @@
-// Recuperation de la quantite selectionné
-let cartQuantite = localStorage.getItem("quantite");
-console.log(cartQuantite);
+// Recuperation des canapes selectionnés : Id, quantite, couleur
+let cartCanaps = JSON.parse(localStorage.getItem("selectProducts"));
+console.log(cartCanaps);
 
-//Recuperation de la couleur selectionnée
-let cartCouleur = localStorage.getItem("couleur");
-console.log(cartCouleur);
+// Recuperation de l url des produits selectiones
+cartUrlProduct = "http://localhost:3000/api/products/";
+console.log(cartUrlProduct);
 
-
-//Recupération de l ID du canape selectionné
-let cartId = localStorage.getItem("id");
-console.log(cartId);
-
-// Recuperation de l url du produit selectione
-cartUrlProduct = "http://localhost:3000/api/products/"+cartId;
-
-//fonction de recuperation du canape selectionne
+//fonction de recuperation des canapes selectionnes
 function cartProductUrl (url) {
     fetch(url)
         .then(function(res) {
@@ -34,31 +26,30 @@ function cartProductUrl (url) {
     }
 
 // fonction affichage des infos du canape selectionne
-function displayCartDetailCanape (cartProduct) {
-    // Test de recuperation du nom pour le canape
-    console.log(cartProduct.name);
+function displayCartDetailCanape (cartCanapes) {
+  for (let cartCanape of cartCanapes) {
     let article = document.createElement("article");
     cartCanap.appendChild(article);
 
     let titre = document.createElement("h2");
-    titre.textContent = cartProduct.name;
+    titre.textContent = cartCanape.name;
     article.appendChild(titre);
 
     let couleurcanapselec = document.createElement("p");
-    couleurcanapselec.textContent = cartCouleur;
+    couleurcanapselec.textContent = cartCanape.couleur;
     article.appendChild(couleurcanapselec);
     
     let prix = document.createElement("p");
-    prix.textContent = `${cartProduct.price} €`;
+    prix.textContent = `${cartCanape.price} €`;
     article.appendChild(prix);    
                 
     cartImg = document.getElementsByClassName("cart__item__img")[0];
     let image = document.createElement("img");
-    image.src = cartProduct.imageUrl;
-    image.alt = cartProduct.altTxt;
+    image.src = cartCanape.imageUrl;
+    image.alt = cartCanape.altTxt;
     cartImg.appendChild(image);
 }
-
+}
 cartProductUrl(cartUrlProduct);
 let cartCanap = document.querySelector(".cart__item__content__description");
 

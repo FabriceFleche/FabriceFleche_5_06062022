@@ -27,11 +27,13 @@ fetch(url)
 
 // fonction affichage des infos du canape selectionne
 function displayDetailCanape (Product) {
+  
   // Test de recuperation du nom pour le canape
   console.log(Product.name);
-  document.getElementById("title").innerHTML = Product.name;
-  document.getElementById("price").innerHTML = Product.price;
-  document.getElementById("description").innerHTML = Product.description;
+
+  document.getElementById("title").textContent = Product.name;
+  document.getElementById("price").textContent = Product.price;
+  document.getElementById("description").textContent = Product.description;
       
   productImage = document.getElementsByClassName("item__img")[0];
   let image = document.createElement("img");
@@ -71,13 +73,13 @@ if (cartArray == null) {
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
 }
   //Si rajout du meme canape dans le panier, ajout des quantites
-else if (cartArray.find((item) => item.id === refId && item.couleur == optionColor))
-  cartArray.map((objet) => {
-  if (objet.id == refId && objet.couleur == optionColor) {
-    objet.quantite += parseInt(inputQuantity);
+else if (cartArray.find((item) => item.id === refId && item.couleur == optionColor)){
+  cartArray.map((canap) => {
+  if (canap.id == refId && canap.couleur == optionColor) {
+    canap.quantite += parseInt(inputQuantity);
     localStorage.setItem('selectProducts',JSON.stringify(cartArray));
 }})
-else {
+} else {
   cartArray.push(selectProduct);
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
   }
