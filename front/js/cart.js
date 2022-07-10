@@ -1,55 +1,81 @@
 // Recuperation des canapes selectionnés : Id, quantite, couleur
-let cartCanaps = JSON.parse(localStorage.getItem("selectProducts"));
-console.log(cartCanaps);
+let cartCanapes = JSON.parse(localStorage.getItem("selectProducts"));
+console.log(cartCanapes);
 
-// Recuperation de l url des produits selectiones
-cartUrlProduct = "http://localhost:3000/api/products/";
-console.log(cartUrlProduct);
 
-//fonction de recuperation des canapes selectionnes
-function cartProductUrl (url) {
-    fetch(url)
-        .then(function(res) {
-          if (res.ok) {
-            return res.json();
+
+// Recuperation des ID de la totalité des canapes
+function recupIdCanapesApi (url) {
+  fetch(url)
+      .then(function(res) {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then(function(catalogApi) {
+
+        // Conteneur des blocs du panier
+        let cartItems = document.getElementById('cart__items');
+
+        // Noeud representant un bloc du panier
+        let cartLine = document.getElementsByClassName('cart__item')[0];
+  
+        // On supprime le bloc deja présent
+        cartItems.removeChild(cartLine);
+        
+        // On boucle sur le panier
+        for(let cartItem of cartCanapes) {
+          
+          let cartArticleInfo;
+          // on boucle dans le catalogue pour avoir les infos de l'article en cours
+          for(let article of catalogApi) {
+            if(cartItem.id === article._id) {
+              cartArticleInfo = article;
+              cartArticleColors = cartItem.couleur;
+              cartArticleQuantite = cartItem.quantite;
+              break;
             }
-        })
-        .then(function(cartDetailCanape) {
-          console.log(cartDetailCanape);
-          displayCartDetailCanape(cartDetailCanape);
-        })
-    
-        .catch(function(err) {
-          console.log("erreur : " + err)
-          alert("erreur : " + err)
-        });
-    }
+          }
 
-// fonction affichage des infos du canape selectionne
-function displayCartDetailCanape (cartCanapes) {
-  for (let cartCanape of cartCanapes) {
-    let article = document.createElement("article");
-    cartCanap.appendChild(article);
+          console.log(cartArticleInfo);
 
-    let titre = document.createElement("h2");
-    titre.textContent = cartCanape.name;
-    article.appendChild(titre);
+          // on clone le bloc
+          let clone = cartLine.cloneNode(true);
+          // et on l'ajoute au conteneur
+          cartItems.appendChild(clone);
 
-    let couleurcanapselec = document.createElement("p");
-    couleurcanapselec.textContent = cartCanape.couleur;
-    article.appendChild(couleurcanapselec);
-    
-    let prix = document.createElement("p");
-    prix.textContent = `${cartCanape.price} €`;
-    article.appendChild(prix);    
-                
-    cartImg = document.getElementsByClassName("cart__item__img")[0];
-    let image = document.createElement("img");
-    image.src = cartCanape.imageUrl;
-    image.alt = cartCanape.altTxt;
-    cartImg.appendChild(image);
-}
-}
-cartProductUrl(cartUrlProduct);
-let cartCanap = document.querySelector(".cart__item__content__description");
+          //affichage du nom
+          let title = clone.querySelector(".cart__item__content__description > h2");
+          title.textContent = cartArticleInfo.name;
 
+          //affichage de la couleur
+          let couleur = clone.querySelector(".cart__item__content__description > p");
+          couleur.textContent = cartArticleColors;
+       
+          //affichage du tarif  
+          let tarif = clone.querySelector(".cart__item__content__description > p:nth-child(3)");
+          tarif.textContent = cartArticleInfo.price;
+          
+          //affichage de la photo
+          productImage = clone.querySelector('.cart__item__img');
+          let image = document.createElement("img");
+          image.src = cartArticleInfo.imageUrl;
+          image.alt = cartArticleInfo.altTxt;
+          productImage.appendChild(image);
+          
+          //affichage de la quantite
+          let quantite = clone.querySelector('.itemQuantity');
+          quantite.value = cartArticleQuantite;
+        }
+
+
+
+      })
+  
+      .catch(function(err) {
+        console.log("erreur : " + err)
+        alert("erreur : " + err)
+      });
+  }
+
+recupIdCanapesApi("http://localhost:3000/api/products/")
