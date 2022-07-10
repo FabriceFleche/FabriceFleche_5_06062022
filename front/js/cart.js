@@ -25,7 +25,6 @@ function recupIdCanapesApi (url) {
         
         // On boucle sur le panier
         for(let cartItem of cartCanapes) {
-          
           let cartArticleInfo;
           // on boucle dans le catalogue pour avoir les infos de l'article en cours
           for(let article of catalogApi) {
@@ -36,7 +35,6 @@ function recupIdCanapesApi (url) {
               break;
             }
           }
-
           console.log(cartArticleInfo);
 
           // on clone le bloc
@@ -66,10 +64,13 @@ function recupIdCanapesApi (url) {
           //affichage de la quantite
           let quantite = clone.querySelector('.itemQuantity');
           quantite.value = cartArticleQuantite;
+
+          //affichage de la totalQuantity
+          let quantiteTotal = document.getElementsByClassName("itemQuantity")[0].value;
+          //let totalQuantity = clone.querySelector("#totalQuantity").textContent;
+          //totalQuantity = 2;
+          console.log(quantiteTotal);
         }
-
-
-
       })
   
       .catch(function(err) {
