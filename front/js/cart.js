@@ -32,6 +32,7 @@ function recupIdCanapesApi (url) {
               cartArticleInfo = article;
               cartArticleColors = cartItem.couleur;
               cartArticleQuantite = cartItem.quantite;
+              cartArticlePrix = cartItem.price;
               break;
             }
           }
@@ -76,45 +77,75 @@ function recupIdCanapesApi (url) {
           let quantite = clone.querySelector('.itemQuantity');
           quantite.value = cartArticleQuantite;
 
-          //affichage de la Quantite totale
-         
-          totalQtePrix();
+          //modification de la quantite depuis page panier
+          
 
-          function totalQtePrix() {
-            let totalprix = 0;
+          //affichage de la Quantite totale
+          totalQte();
+          function totalQte() {
             let totalQuantite = 0;
             let inputs = document.querySelectorAll(".itemQuantity");
-            inputs.forEach((itemQuantity, price) => {
-                let productQty = parseInt(itemQuantity.value);
-                let productPrice = parseInt(price);
-                totalQuantite += productQty;
-                let productTotalPrice = productPrice * productQty;
-                totalprix += productTotalPrice;
-                console.log(productPrice);
+            inputs.forEach((itemQuantity) => {
+              let productQty = parseInt(itemQuantity.value);
+              totalQuantite += productQty;
             });
             document.getElementById("totalQuantity").textContent = `${totalQuantite}`;
-            document.getElementById("totalPrice").textContent = `${totalprix}`;
-            
           }
-       
-      // Gestion de la suppresion d'un produit
+          //affichage du prix total
+          /*totalPrice ();
+          function totalPrice () {
+            let totalPrix = 0;
+            let inputs = document.querySelectorAll(".cart__item__content__description > p:nth-child(3)");
+            inputs.forEach((cartItem) => {
+              let productPrice = parseInt(cartItem.price);
+              
+              totalPrix += cartItem.quantite * productPrice;
+            });
+            document.getElementById("totalPrice").textContent = `${totalPrix}`;
+          }*/
+            let totalPrix = 0;  
+            let affichageTotalPrix = document.querySelector("#totalPrice");
+              for (let cartItem of cartCanapes) {
+                totalPrix += cartItem.quantite * cartArticleInfo.price;
+              }
+            affichageTotalPrix.textContent = totalPrix;
+          };
 
-          function supprimeCanap () {
-            
-          }
+          // Gestion de la suppresion d'un produit
+          const deleteCartItem = document.querySelectorAll(".deleteItem");
+                    
+          /*for (let cartItem of cartCanapes){
+            cartItem.addEventListener("click", (event) =>{
+              event.preventDefault();
+              //console.log(event);
 
+              //selection de ID du produit qui va etre supprimer
+              let id_selectionner_suppression = cartArticleInfo._id;
+              console.log(id_selectionner_suppression)
 
-      const boutonCart = document.getElementsByClassName("deleteItem");
-      //boutonCart.addEventListener("click", supprimeCanap);
+              //selection des elements a garder puis suppresion de l element cliqué
+              //article = article.filter(el => el.cartItem !== id_selectionner_suppression);
+              //console.log(cartCanapes);
 
+              //envoi dans le localstorage
+              //localStorage.setItem('carrItem',JSON.stringify('selectProducts'));
 
-       }
-    })
+              //avertir que le produit va etre supprimer et actualiser la page
+              //alert("le produit a été supprimer du panier");
+              //window.location.href = "cart.html";
+            })
+          }*/
+
+          
+      })
       
       .catch(function(err) {
         console.log("erreur : " + err)
         alert("erreur : " + err)
       });
-  }
+}
 
+
+
+//lien vers API
 recupIdCanapesApi("http://localhost:3000/api/products/")
