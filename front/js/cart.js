@@ -36,7 +36,7 @@ function recupIdCanapesApi (url) {
               break;
             }
           }
-          console.log(cartArticleInfo);
+          //console.log(catalogApi);
 
           // on clone le bloc
           let clone = cartLine.cloneNode(true);
@@ -54,7 +54,7 @@ function recupIdCanapesApi (url) {
           //affichage du tarif  
           let tarif = clone.querySelector(".cart__item__content__description > p:nth-child(3)");
           tarif.textContent = cartArticleInfo.price;
-          console.log(cartArticleInfo.price)
+                //console.log(cartArticleInfo.price)
 
           //Renseignement des dataSet
           let dataSetId = cartArticleInfo._id;
@@ -91,30 +91,50 @@ function recupIdCanapesApi (url) {
             });
             document.getElementById("totalQuantity").textContent = `${totalQuantite}`;
           }
-          //affichage du prix total
-          /*totalPrice ();
-          function totalPrice () {
-            let totalPrix = 0;
-            let inputs = document.querySelectorAll(".cart__item__content__description > p:nth-child(3)");
-            inputs.forEach((cartItem) => {
-              let productPrice = parseInt(cartItem.price);
-              
-              totalPrix += cartItem.quantite * productPrice;
-            });
-            document.getElementById("totalPrice").textContent = `${totalPrix}`;
-          }*/
-            let totalPrix = 0;  
-            let affichageTotalPrix = document.querySelector("#totalPrice");
-              for (let cartItem of cartCanapes) {
-                totalPrix += cartItem.quantite * cartArticleInfo.price;
-              }
-            affichageTotalPrix.textContent = totalPrix;
-          };
+          /*//affichage du prix total d'un canape selectionne en tenant compte de la quantite
+          let totalPrix = 0;  
+          let prixTotalCalcul = [];
+          totalPrix += cartItem.quantite * cartArticleInfo.price;
+          prixTotalCalcul.push(totalPrix);
+          console.log(prixTotalCalcul);
 
+          //affichage du tarif global de tous les canapes selectionnes
+          let globalTarif = 0;
+          let affichageTotalPrix = document.querySelector("#totalPrice");
+          for (prixTot of prixTotalCalcul) {
+            globalTarif += prixTot;
+            console.log(globalTarif);
+          }
+          affichageTotalPrix.textContent = globalTarif;
+          */
+          
+          //affichage du tarif global de tous les canapes selectionnes
+          let affichageTotalPrix = document.querySelector("#totalPrice");
+          getKanapPrice();
+          function getKanapPrice(){
+            return new Promise((resolve) => {
+              const totalPrix = cartItem.quantite * cartArticleInfo.price;
+              resolve(totalPrix);
+              console.log(totalPrix);
+            })
+          };
+          Promise.all([getKanapPrice()]).then((result)=>{
+            let globalTarif = 0;
+            const j = result.length;
+            for(let i=0; i<j; i++){
+              globalTarif = globalTarif + result[i];
+            }
+            console.log(globalTarif);
+            affichageTotalPrix.textContent = globalTarif;
+          });
+          
+
+          };
+          /*
           // Gestion de la suppresion d'un produit
           const deleteCartItem = document.querySelectorAll(".deleteItem");
                     
-          /*for (let cartItem of cartCanapes){
+         for (let cartItem of cartCanapes){
             cartItem.addEventListener("click", (event) =>{
               event.preventDefault();
               //console.log(event);
@@ -145,7 +165,113 @@ function recupIdCanapesApi (url) {
       });
 }
 
+//----------------------------Formulaire de contact---------------------------------------
+let formArray = JSON.parse(localStorage.getItem('donneesCart'));
 
 
-//lien vers API
+//verification que les champs sont correctement completes
+let prenom = document.getElementById("firstName");
+let nom = document.getElementById("lastName");
+let adresse = document.getElementById("address");
+let ville = document.getElementById("city");
+let email = document.getElementById("email");
+let myRegex = /^[a-zA-Z-\s]+$/;
+let myRegexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const monFormulaire = document.getElementById("order");
+monFormulaire.addEventListener('click', function(event) {
+  if (prenom.value == "") {
+    let erreur = document.getElementById("firstNameErrorMsg");
+    erreur.textContent = "Le champ n'est pas renseigné";
+    event.prevenDefault();
+  } else if (myRegex.test(prenom.value) == false) {
+    let erreur = document.getElementById("firstNameErrorMsg");
+    erreur.textContent = "Le prénom doit comporter que des lettres avec eventuellement des tirets ou espaces";
+    e.prevenDefault();
+  } else {
+    let erreur = document.getElementById("firstNameErrorMsg");
+    erreur.textContent = "Ok";
+    erreur.style.color = "green";
+    let recupPrenom = document.getElementById('firstName').value;
+    let formArray = [];
+    formArray.push(recupPrenom);
+    localStorage.setItem('donneesCart',JSON.stringify(formArray));
+    console.log(recupPrenom);
+  }
+});  
+monFormulaire.addEventListener('click', function(event) {
+  if (nom.value == "") {
+    let erreur = document.getElementById("lastNameErrorMsg");
+    erreur.textContent = "Le champ n'est pas renseigné";
+    event.prevenDefault();
+  } else if (myRegex.test(nom.value) == false) {
+    let erreur = document.getElementById("lastNameErrorMsg");
+    erreur.textContent = "Le nom doit comporter que des lettres avec eventuellement des tirets ou espaces";
+    e.prevenDefault();
+  } else {
+    let erreur = document.getElementById("lastNameErrorMsg");
+    erreur.textContent = "Ok";
+    erreur.style.color = "green";
+    let recupNom = document.getElementById('lastName').value;
+    formArray.push(recupNom);
+    localStorage.setItem('donneesCart',JSON.stringify(formArray));
+    console.log(recupNom);
+  }
+});
+monFormulaire.addEventListener('click', function(event) {
+  if (adresse.value == "") {
+    let erreur = document.getElementById("addressErrorMsg");
+    erreur.textContent = "Le champ n'est pas renseigné";
+    event.prevenDefault();
+  } else {
+    let erreur = document.getElementById("addressErrorMsg");
+    erreur.textContent = "Ok";
+    erreur.style.color = "green";
+    erreur.style.color = "green";
+    let recupAdresse = document.getElementById('address').value;
+    formArray.push(recupAdresse);
+    localStorage.setItem('donneesCart',JSON.stringify(formArray));
+    console.log(recupAdresse);
+  }
+});
+monFormulaire.addEventListener('click', function(event) {
+  if (ville.value == "") {
+    let erreur = document.getElementById("cityErrorMsg");
+    erreur.textContent = "Le champ n'est pas renseigné";
+    event.prevenDefault();
+  } else if (myRegex.test(ville.value) == false) {
+    let erreur = document.getElementById("cityErrorMsg");
+    erreur.textContent = "La ville doit comporter que des lettres avec eventuellement des tirets ou espaces";
+    e.prevenDefault();
+  } else {
+    let erreur = document.getElementById("cityErrorMsg");
+    erreur.textContent = "Ok";
+    erreur.style.color = "green";
+    let recupVille = document.getElementById('city').value;
+    formArray.push(recupVille);
+    localStorage.setItem('donneesCart',JSON.stringify(formArray));
+    console.log(recupVille);
+  }
+});
+monFormulaire.addEventListener('click', function(event) {
+  if (email.value == "") {
+    let erreur = document.getElementById("emailErrorMsg");
+    erreur.textContent = "Le champ n'est pas renseigné";
+    event.prevenDefault();
+  } else if (myRegexMail.test(email.value) == false) {
+    let erreur = document.getElementById("emailErrorMsg");
+    erreur.textContent = "Le format de l adresse email n est pas conforme";
+    e.prevenDefault();
+  } else {
+    let erreur = document.getElementById("emailErrorMsg");
+    erreur.textContent = "Ok";
+    erreur.style.color = "green";
+    let recupEmail = document.getElementById('email').value;
+    formArray.push(recupEmail);
+    localStorage.setItem('donneesCart',JSON.stringify(formArray));
+    console.log(recupEmail);
+  }
+});
+
+
+//-------------------------------lien vers API--------------------------------------------
 recupIdCanapesApi("http://localhost:3000/api/products/")
