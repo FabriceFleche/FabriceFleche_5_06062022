@@ -1,43 +1,155 @@
-// Recuperation des canapes selectionnés : Id, quantite, couleur
-let cartCanapes = JSON.parse(localStorage.getItem("selectProducts"));
+let Cart = {
 
-function getKanapInfos(kanap){
+  products: [],
+  infoApi: [],
 
-  return new Promise((resolve)=>{
+  addProduct: function (id, couleur, qte) {
 
-        fetch(`http://localhost:3000/api/products/${kanap.id}`)
-        .then((response)=>{
-            return response.json();
-        })
-        .then((result)=>{
+    let found = false;
+    Cart.products.map((item) => {
+      if (item.id === id && item.couleur === couleur) {
+        item.quantite += parseInt(qte);
+        found = true;
+      }
+    });
+    if (found === false) {
+      Cart.products.push(
+        {
+          id: id,
+          couleur: couleur,
+          quantite: qte,
+        }
+      );
+    }
+  },
 
-             kanap.price = result.price;
+  removeProduct: function (id, couleur, qte) {
 
-             kanap.imageUrl = result.imageUrl;
+    let indexToDelete = -1;
+    for (let index in Cart.products) {
+      if (Cart.products[index].id === id && Cart.products[index].couleur === couleur) {
+        Cart.products[index].quantite -= parseInt(qte);
+        if (Cart.products[index].quantite <= 0) {
+          indexToDelete = index;
+        }
+        break;
+      }
+    }
+    if (indexToDelete !== -1) {
+      Cart.products.splice(indexToDelete, 1);
+    }
+  },
 
-             kanap.name = result.name;
+  removeAllProduct: function(id, couleur) {
+    let indexToDelete = -1;
+    for( let index in Cart.products ) {
+        if( Cart.products[index].id === id && Cart.products[index].couleur === couleur ) {
+            indexToDelete = index;
+            break;
+        }
+    }
+    if( indexToDelete !== -1 ) {
+        Cart.products.splice(indexToDelete, 1);
+    }
+},
 
-             return resolve(kanap);
-        })
+setProductQuantity : function(id, couleur, quantite) {
+  if (quantite <= 0) {
+    Cart.removeAllProduct(id, couleur);
+  } else {
+    let found = false;
+    Cart.products.map((item) => {
+      if (item.id === id && item.couleur === couleur) {
+        item.quantite = parseInt(quantite);
+        found = true;
+      }
+    });
+    if (found === false) {
+      Cart.products.push(
+        {
+          id: id,
+          couleur: couleur,
+          quantite: quantite,
+        }
+      );
+    }
+  }
 
-  });
+},
+// fonction qui retourne le nombre total d'article du panier
+getTotalQuantity : function (){
+  return Cart.products.reduce(
+    (previousValue, currentValue)=> previousValue + currentValue.quantite, 
+    0
+  )
+
+},
+
+// fonction qui retourne le nombre total d'article du panier
+getTotalPrice : function (){
+  return Cart.products.reduce(
+    (previousValue, currentValue)=> {
+      let priceUnit = 0;
+      for (item of Cart.infoApi) {
+        if (item.id === currentValue.id && item.couleur === currentValue.couleur) {
+          priceUnit = parseInt(item.price);
+          break;
+        }
+      }
+      return previousValue + priceUnit * currentValue.quantite;
+    }, 
+    0
+  )
+
+},
+  // ---------------------------------------------------
+  // Methodes gérant la persistance
+  read: function () {
+    console.log('recuperation panier');
+    Cart.products = JSON.parse(localStorage.getItem('selectProducts')) || [];
+    console.log(Cart.products)
+  },
+
+  write: function () {
+    localStorage.setItem('selectProducts', JSON.stringify(Cart.products));
+    console.log('Panier sauvegardé');
+  },
+
+  clear: function () {
+    localStorage.clear();
+    console.log('Panier vidé');
+  }
 
 }
 
+// Recuperation des canapes selectionnés : Id, quantite, couleur
+//let cartCanapes = JSON.parse(localStorage.getItem("selectProducts"));
+Cart.read();
 
-Promise.all(cartCanapes.map(getKanapInfos)).then((result)=>{
+function getKanapInfos(kanap){
+  return new Promise((resolve)=>{
+    fetch(`http://localhost:3000/api/products/${kanap.id}`)
+      .then((response)=>{
+        console.log("api");
+        return response.json();
+      })
+      .then((result)=>{
+        kanap.price = result.price;
+        kanap.imageUrl = result.imageUrl;
+        kanap.name = result.name;
+        return resolve(kanap);
+      })
+  });
+}
 
-    let sumPrice = 0;
-
-    let sumQuantity = 0;
-
-    const j = result.length;
-
-    let html = "";
-
-    for(let i=0; i<j; i++){
-
-          html+= `
+Promise.all(Cart.products.map(getKanapInfos)).then((result)=>{
+  let sumPrice = 0;
+  Cart.infoApi = result;
+  let sumQuantity = 0;
+  const j = result.length;
+  let html = "";
+  for(let i=0; i<j; i++){
+    html+= `
           
             <article class="cart__item" data-id="${result[i].id}" data-color="${result[i].couleur}">
             <div class="cart__item__img">
@@ -55,54 +167,66 @@ Promise.all(cartCanapes.map(getKanapInfos)).then((result)=>{
                   <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=${result[i].quantite}>
                 </div>
                 <div class="cart__item__content__settings__delete">
-                  <p class="deleteItem" data-id-parent="${result[i].id}">Supprimer</p>
+                  <p class="deleteItem" data-color-parent="${result[i].couleur}" data-id-parent="${result[i].id}">Supprimer</p>
                 </div>
               </div>
             </div>
           </article>
           
           `;
-  
-        sumPrice = sumPrice + (result[i].price * result[i].quantite);
-
-        sumQuantity = sumQuantity + result[i].quantite;
-    }
+    // Affichage du prix et de la quantite global
+    sumPrice = sumPrice + (result[i].price * result[i].quantite);
+    sumQuantity = sumQuantity + result[i].quantite;
+  }
 
     const cardItems = document.querySelector("#cart__items");
-
     const totalQuantity = document.querySelector("#totalQuantity");
-
     const totalPrice = document.querySelector("#totalPrice");
 
     cardItems.innerHTML = html;
-
     totalQuantity.textContent = sumQuantity;
-
     totalPrice.textContent = sumPrice;
 
     const articleParents = cardItems.querySelectorAll(".cart__item");
-
     const deleteKanap = document.querySelectorAll(".deleteItem");
-
     const k = deleteKanap.length;
 
-    for(let i=0; i<k; i++){
-
-          deleteKanap[i].addEventListener("click", ()=>{
-
-                 const articleQuantity = articleParents[i].querySelector(".itemQuantity").value;
-
-                 const articleTotalPrice = result[i].price * Number(articleQuantity);
-
-                 totalQuantity.textContent = Number(totalQuantity.textContent) - Number(articleQuantity);
-
-                 totalPrice.textContent = Number(totalPrice.textContent) - Number(articleTotalPrice);
-
-                articleParents[i].remove();
-                
-
-          });
+// Gestion de la modification de la quantite depuis la page panier
+    const imputCanape = document.querySelectorAll(".itemQuantity");
+    for (let i = 0; i < imputCanape.length; i++) {
+      
+      imputCanape[i].addEventListener("change", () => {
+        // Mise a jour de quantite dans l objet panier        
+        Cart.setProductQuantity(deleteKanap[i].getAttribute("data-id-parent"),deleteKanap[i].getAttribute("data-color-parent"),imputCanape[i].value);
+        Cart.write();
+        //Modification de la quantite et du tarif global lors de la suppression d'un canape
+        totalQuantity.textContent = Cart.getTotalQuantity();
+        totalPrice.textContent = Cart.getTotalPrice();
+        //suppression du canape si quantite inferieur ou egal 0
+        if(imputCanape[i].value <= 0){
+          articleParents[i].remove();
+        }
+        
+       
+      })
     }
+      
+// Gestion de la suppression d un canape
+  for (let i = 0; i < k; i++) {
+    deleteKanap[i].addEventListener("click", () => {
+      const articleQuantity = articleParents[i].querySelector(".itemQuantity").value;
+      const articleTotalPrice = result[i].price * Number(articleQuantity);
+      //Modification de la quantite et du tarif global lors de la suppression d'un canape
+      totalQuantity.textContent = Number(totalQuantity.textContent) - Number(articleQuantity);
+      totalPrice.textContent = Number(totalPrice.textContent) - Number(articleTotalPrice);
+      // suppression du canape du DOM
+      articleParents[i].remove();
+      // suppresion du canape du localstorage        
+      Cart.removeAllProduct(deleteKanap[i].getAttribute("data-id-parent"),deleteKanap[i].getAttribute("data-color-parent"));
+      Cart.write();
+     
+    })
+  }
 });
 
  //----------------------------Formulaire de contact---------------------------------------
