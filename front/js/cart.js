@@ -1,5 +1,4 @@
 let Cart = {
-
   products: [],
   infoApi: [],
   // Ajout d un nouveau canape dans le panier
@@ -230,8 +229,22 @@ let myRegexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 //verification que les champs sont correctement completes
 const monFormulaire = document.getElementById("order");
+let validationVerifFirsName = false;
+let validationVerifLastName = false;
+let validationVerifAddress = false;
+let validationVerifCity = false;
+let validationVerifEmail = false;
 
-monFormulaire.addEventListener('click', function verif() {
+// recuperation des ID du panier
+let products = [];
+let panierId = JSON.parse(localStorage.getItem('selectProducts'));
+panierId.forEach(item => {
+  products.push(item.id);
+});
+console.log(products);
+
+//fonction de vérification de la conformite du prenom
+function verifFirsName() {
   if (prenom.value == "") {
     let erreur = document.getElementById("firstNameErrorMsg");
     erreur.textContent = "Le champ n'est pas renseigné";
@@ -244,9 +257,12 @@ monFormulaire.addEventListener('click', function verif() {
     let erreur = document.getElementById("firstNameErrorMsg");
     erreur.textContent = "Ok";
     erreur.style.color = "green";
+    validationVerifFirsName = true;
   }
-});  
-monFormulaire.addEventListener('click', function verif() {
+};
+
+//fonction de vérification de la conformite du nom
+function verifLastName() {
   if (nom.value == "") {
     let erreur = document.getElementById("lastNameErrorMsg");
     erreur.textContent = "Le champ n'est pas renseigné";
@@ -259,9 +275,12 @@ monFormulaire.addEventListener('click', function verif() {
     let erreur = document.getElementById("lastNameErrorMsg");
     erreur.textContent = "Ok";
     erreur.style.color = "green";
+    validationVerifLastName = true;
   }
-});
-monFormulaire.addEventListener('click', function verif() {
+};
+
+//fonction de vérification de la conformite de l adresse
+function verifAddress() {
   if (adresse.value == "") {
     let erreur = document.getElementById("addressErrorMsg");
     erreur.textContent = "Le champ n'est pas renseigné";
@@ -270,9 +289,12 @@ monFormulaire.addEventListener('click', function verif() {
     let erreur = document.getElementById("addressErrorMsg");
     erreur.textContent = "Ok";
     erreur.style.color = "green";
+    validationVerifAddress = true;
   }
-});
-monFormulaire.addEventListener('click', function verif() {
+};
+
+//fonction de vérification de la conformite de la ville
+function verifCity() {
   if (ville.value == "") {
     let erreur = document.getElementById("cityErrorMsg");
     erreur.textContent = "Le champ n'est pas renseigné";
@@ -285,9 +307,12 @@ monFormulaire.addEventListener('click', function verif() {
     let erreur = document.getElementById("cityErrorMsg");
     erreur.textContent = "Ok";
     erreur.style.color = "green";
+    validationVerifCity = true;
   }
-});
-monFormulaire.addEventListener('click', function verif() {
+};
+
+//fonction de vérification de la conformite de l'email
+function verifEmail() {
   if (email.value == "") {
     let erreur = document.getElementById("emailErrorMsg");
     erreur.textContent = "Le champ n'est pas renseigné";
@@ -300,23 +325,50 @@ monFormulaire.addEventListener('click', function verif() {
     let erreur = document.getElementById("emailErrorMsg");
     erreur.textContent = "Ok";
     erreur.style.color = "green";
+    validationVerifEmail = true;
   }
-});
+};
 
 // Enregistrement des données du formulaire dans un objet et envoi dans le localStorage
 monFormulaire.addEventListener('click', function () {
-  let data = {
-    contact: {
-      firstName: prenom.value,
-      lastName: nom.value,
-      address: adresse.value,
-      city: ville.value,
-      email: email.value,
-    }
-    //products: cartIds
-  }  
-  localStorage.setItem('contact', JSON.stringify(data));
-  window.location.href = "./confirmation.html";
+  verifFirsName();
+  verifLastName();
+  verifAddress();
+  verifCity();
+  verifEmail();
+  if (validationVerifFirsName != true || validationVerifLastName != true || validationVerifAddress != true || validationVerifCity != true || validationVerifEmail != true ) {
+    alert("Les champs du formulaire ne sont pas renseignés correctement");
+  } else {
+      let data = {
+        contact: {
+          firstName: prenom.value,
+          lastName: nom.value,
+          address: adresse.value,
+          city: ville.value,
+          email: email.value,
+        },
+        products,
+      }
+
+      localStorage.setItem('contact', JSON.stringify(data));
+    
+      fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify(contact),
+      })
+      .then((response) => response.json())
+      .then(order => {
+        let numeroCommande = `${order.Id}`;
+        alert(numeroCommande)
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Erreur technique");
+      });
+    };
 });
 
 

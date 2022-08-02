@@ -71,6 +71,7 @@ if (cartArray == null) {
   let cartArray = [];
   cartArray.push(selectProduct);
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+  alert("Canapé ajouté au panier");
 }
   //Si rajout du meme canape dans le panier, ajout des quantites
 else if (cartArray.find((item) => item.id === refId && item.couleur == optionColor)){
@@ -78,10 +79,12 @@ else if (cartArray.find((item) => item.id === refId && item.couleur == optionCol
   if (canap.id == refId && canap.couleur == optionColor) {
     canap.quantite += parseInt(inputQuantity);
     localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+    alert("Mise à jour du panier effectuée");
 }})
 } else {
   cartArray.push(selectProduct);
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+  alert("Canapé ajouté au panier");
   }
 }
 
