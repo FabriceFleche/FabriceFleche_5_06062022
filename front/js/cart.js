@@ -361,21 +361,21 @@ function validationFormulaire() {
         body: JSON.stringify(data),
       })
       .then((response) => response.json())
-      .then((response) => {
-        orderId = response.orderId;
-        console.log(orderId);
+      .then((serveur) => {
+        orderId = serveur,
+        console.log(orderId)
+        location.href = "confirmation.html?id=" + orderId.orderId;
       })
       .catch((error) => {
-        console.log(error);
-        alert("Erreur technique");
+        console.log(error)
+        alert("Erreur technique")
       });
-      //if ("0" == "0") {
-        //location.href="confirmation.html?id=" + orderId;
-      //}
+            
     }};
   
-
-
 //gestion du bouton commander
 const monFormulaire = document.getElementById("order");
-monFormulaire.addEventListener("click", validationFormulaire);
+monFormulaire.addEventListener("click", (event) => {
+  event.preventDefault();
+  validationFormulaire();
+});
