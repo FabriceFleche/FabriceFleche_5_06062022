@@ -58,7 +58,7 @@ let cartArray = JSON.parse(localStorage.getItem('selectProducts'));
 
 //fonction récuperation des donnees saisies
 function recupSaisieCanap() {
-  //Stockage de l ID du canape selectionne
+  //Stockage de l ID, de la quantité et de la couleur du canape selectionne
   var optionColor = document.getElementById('colors').value;
   var inputQuantity = document.getElementById("quantity").value;
   let selectProduct = {
@@ -68,10 +68,14 @@ function recupSaisieCanap() {
   }
   //Creation d'un tableau si c'est le 1er canape place dans le panier
 if (cartArray == null) {
+  if (inputQuantity != 0 && optionColor != "") {
   let cartArray = [];
   cartArray.push(selectProduct);
   localStorage.setItem('selectProducts',JSON.stringify(cartArray));
   alert("Canapé ajouté au panier");
+  } else {
+    alert("Vous devez sélectionner une couleur et une quantité");
+  }
 }
   //Si rajout du meme canape dans le panier, ajout des quantites
 else if (cartArray.find((item) => item.id === refId && item.couleur == optionColor)){
@@ -82,15 +86,20 @@ else if (cartArray.find((item) => item.id === refId && item.couleur == optionCol
     alert("Mise à jour du panier effectuée");
 }})
 } else {
-  cartArray.push(selectProduct);
-  localStorage.setItem('selectProducts',JSON.stringify(cartArray));
-  alert("Canapé ajouté au panier");
+    if (inputQuantity != 0 && optionColor != "") {
+    cartArray.push(selectProduct);
+    localStorage.setItem('selectProducts',JSON.stringify(cartArray));
+    alert("Canapé ajouté au panier");
+    } else {
+    alert("Vous devez sélectionner une couleur et une quantité");
+    }
   }
-}
+  console.log(optionColor);
+};
 
 //gestion du bouton ajouter au panier
 const boutonProduct = document.getElementById("addToCart");
 boutonProduct.addEventListener("click", recupSaisieCanap);
 
-//console.log(cartArray);
+
 console.log(JSON.parse(localStorage.getItem('selectProducts')));

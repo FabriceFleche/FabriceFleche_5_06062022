@@ -228,7 +228,7 @@ let myRegex = /^[a-zA-Z-\s]+$/;
 let myRegexMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 //verification que les champs sont correctement completes
-const monFormulaire = document.getElementById("order");
+
 let validationVerifFirsName = false;
 let validationVerifLastName = false;
 let validationVerifAddress = false;
@@ -239,7 +239,7 @@ let validationVerifEmail = false;
 let products = [];
 let panierId = JSON.parse(localStorage.getItem('selectProducts'));
 panierId.forEach(item => {
-  products.push(item.id);
+  products.push (item.id);
 });
 console.log(products);
 
@@ -330,14 +330,15 @@ function verifEmail() {
 };
 
 // Enregistrement des données du formulaire dans un objet et envoi dans le localStorage
-monFormulaire.addEventListener('click', function () {
+function validationFormulaire() {
   verifFirsName();
   verifLastName();
   verifAddress();
   verifCity();
   verifEmail();
+  
   if (validationVerifFirsName != true || validationVerifLastName != true || validationVerifAddress != true || validationVerifCity != true || validationVerifEmail != true ) {
-    alert("Les champs du formulaire ne sont pas renseignés correctement");
+    console.log("Les champs du formulaire ne sont pas renseignés correctement")
   } else {
       let data = {
         contact: {
@@ -348,28 +349,33 @@ monFormulaire.addEventListener('click', function () {
           email: email.value,
         },
         products,
-      }
+      };
 
       localStorage.setItem('contact', JSON.stringify(data));
-    
+      
       fetch("http://localhost:3000/api/products/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         },
-        body: JSON.stringify(contact),
+        body: JSON.stringify(data),
       })
       .then((response) => response.json())
-      .then(order => {
-        let numeroCommande = `${order.Id}`;
-        alert(numeroCommande)
+      .then((response) => {
+        orderId = response.orderId;
+        console.log(orderId);
       })
       .catch((error) => {
         console.log(error);
         alert("Erreur technique");
       });
-    };
-});
+      //if ("0" == "0") {
+        //location.href="confirmation.html?id=" + orderId;
+      //}
+    }};
+  
 
 
-
+//gestion du bouton commander
+const monFormulaire = document.getElementById("order");
+monFormulaire.addEventListener("click", validationFormulaire);
