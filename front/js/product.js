@@ -99,7 +99,9 @@ else if (cartArray.find((item) => item.id === refId && item.couleur == optionCol
 
 //gestion du bouton ajouter au panier
 const boutonProduct = document.getElementById("addToCart");
-boutonProduct.addEventListener("click", recupSaisieCanap);
-
+boutonProduct.addEventListener("click", (window) => {
+  recupSaisieCanap ();
+  location.assign(location.href);
+});
 
 console.log(JSON.parse(localStorage.getItem('selectProducts')));
