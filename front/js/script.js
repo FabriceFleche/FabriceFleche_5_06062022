@@ -9,13 +9,11 @@ fetch(url)
     }
   })
   .then(function(canapes) {
-    console.log(canapes);
     displayCanapes(canapes);
   })
   .catch(function(err) {
     console.log("erreur : " + err)
     alert("erreur : " + err)
-    // Une erreur est survenue
   });
 }
   
