@@ -1,16 +1,15 @@
 let Cart = {
   products: [],
   infoApi: [],
-  
-  // Fonction pour supprimer un canapé
-  removeProduct: function(id, couleur) {
+
+  // Fonction pour identifier puis supprimer un canapé
+  removeProduct: function (id, couleur) {
     let indexToDelete = -1;
     for (let index in Cart.products) {
-        if (Cart.products[index].id === id && Cart.products[index].couleur === couleur) {
-            indexToDelete = index;
-            console.log(index);
-            break;
-        }
+      if (Cart.products[index].id === id && Cart.products[index].couleur === couleur) {
+        indexToDelete = index;
+        break;
+      }
     }
     if (indexToDelete !== -1) {
       Cart.products.splice(indexToDelete, 1);
@@ -18,7 +17,7 @@ let Cart = {
   },
 
   // fonction lors de la modification de la quantité
-  productQuantity: function(id, couleur, quantite) {
+  productQuantity: function (id, couleur, quantite) {
     if (quantite <= 0) {
       Cart.removeProduct(id, couleur);
     } else {
@@ -44,15 +43,15 @@ let Cart = {
   // fonction qui retourne le nombre total d'article dans le panier
   recupQuantiteTotal: function () {
     return Cart.products.reduce(
-      (previousValue, currentValue)=> previousValue + currentValue.quantite, 
+      (previousValue, currentValue) => previousValue + currentValue.quantite,
       0
     )
   },
 
   // fonction qui retourne le prix total des articles du panier
-  recupPrixTotal : function () {
+  recupPrixTotal: function () {
     return Cart.products.reduce(
-      (previousValue, currentValue)=> {
+      (previousValue, currentValue) => {
         let priceUnit = 0;
         for (item of Cart.infoApi) {
           if (item.id === currentValue.id && item.couleur === currentValue.couleur) {
@@ -61,20 +60,17 @@ let Cart = {
           }
         }
         return previousValue + priceUnit * currentValue.quantite;
-      }, 
+      },
       0
     )
   },
   // Fonction pour la lecture du localStorage
   lecture: function () {
-    console.log('recuperation panier');
     Cart.products = JSON.parse(localStorage.getItem('selectProducts')) || [];
-    console.log(Cart.products)
   },
   // Fonction pour l'écriture dans le localStorage
   ecriture: function () {
     localStorage.setItem('selectProducts', JSON.stringify(Cart.products));
-    console.log('Panier sauvegardé');
   },
 };
 
@@ -82,29 +78,34 @@ let Cart = {
 Cart.lecture();
 
 // Recuperation depuis API : prix, image et nom pour les canapes du panier
-function getKanapInfos(kanap){
-  return new Promise((resolve)=>{
+function getKanapInfos(kanap) {
+  return new Promise((resolve, reject) => {
     fetch(`http://localhost:3000/api/products/${kanap.id}`)
-      .then((response)=>{
+      .then((response) => {
         return response.json();
       })
-      .then((result)=>{
+      .then((result) => {
         kanap.price = result.price;
         kanap.imageUrl = result.imageUrl;
         kanap.name = result.name;
         return resolve(kanap);
       })
+      .catch(function (err) {
+        console.log("erreur : " + err)
+        alert("erreur : " + err)
+        return reject("erreur sur la promise : " + err)
+      });
   });
 }
 //Affichage des informations sur la page
-Promise.all(Cart.products.map(getKanapInfos)).then((result)=>{
+Promise.all(Cart.products.map(getKanapInfos)).then((result) => {
   let sumPrice = 0;
   Cart.infoApi = result;
   let sumQuantity = 0;
   const j = result.length;
   let html = "";
-  for(let i=0; i<j; i++){
-    html+= `
+  for (let i = 0; i < j; i++) {
+    html += `
           <article class="cart__item" data-id="${result[i].id}" data-color="${result[i].couleur}">
             <div class="cart__item__img">
               <img src="${result[i].imageUrl}" alt="Photographie d'un canapé">
@@ -149,18 +150,20 @@ Promise.all(Cart.products.map(getKanapInfos)).then((result)=>{
   for (let i = 0; i < imputCanape.length; i++) {
     imputCanape[i].addEventListener("change", () => {
       // Mise a jour de la quantite du canapé       
-      Cart.productQuantity(deleteKanap[i].getAttribute("data-id-parent"),deleteKanap[i].getAttribute("data-color-parent"),imputCanape[i].value);
+      Cart.productQuantity(deleteKanap[i].getAttribute("data-id-parent"), deleteKanap[i].getAttribute("data-color-parent"), imputCanape[i].value);
       Cart.ecriture();
       //Modification de la quantite et du tarif global lors de la suppression d'un canape
       totalQuantity.textContent = Cart.recupQuantiteTotal();
       totalPrice.textContent = Cart.recupPrixTotal();
       //suppression du canape si quantite inferieur ou egal 0
-      if(imputCanape[i].value <= 0){
+      if (imputCanape[i].value <= 0) {
         articleParents[i].remove();
+        Cart.ecriture();
+        Cart.lecture();
       }
     })
   };
-      
+
   // Gestion de la suppression d un canape
   for (let i = 0; i < k; i++) {
     deleteKanap[i].addEventListener("click", () => {
@@ -172,8 +175,9 @@ Promise.all(Cart.products.map(getKanapInfos)).then((result)=>{
       // suppression du canape du DOM
       articleParents[i].remove();
       // suppresion du canape du localstorage        
-      Cart.removeProduct(deleteKanap[i].getAttribute("data-id-parent"),deleteKanap[i].getAttribute("data-color-parent"));
+      Cart.removeProduct(deleteKanap[i].getAttribute("data-id-parent"), deleteKanap[i].getAttribute("data-color-parent"));
       Cart.ecriture();
+      Cart.lecture();
     })
   }
 });
@@ -201,10 +205,9 @@ let validationLocalStore = false;
 let products = [];
 let panierId = JSON.parse(localStorage.getItem('selectProducts'));
 panierId.forEach(item => {
-  products.push (item.id);
+  products.push(item.id);
 });
-console.log(products);
-console.log(products.length);
+
 //fonction de vérification de la conformite du prenom
 function verifFirsName() {
   if (prenom.value == "") {
@@ -292,8 +295,9 @@ function verifEmail() {
 };
 
 //fonction de vérification si le panier est vide
-function verifLocalStore () {
-  if (products.length != 0) {
+function verifLocalStore() {
+  val = JSON.parse(localStorage.getItem('selectProducts'))
+  if (val.length != 0 || [].length != 0) {
     validationLocalStore = true;
   } else {
     validationLocalStore = false;
@@ -310,7 +314,7 @@ function validationFormulaire() {
   verifLocalStore();
 
   if (validationVerifFirsName != true || validationVerifLastName != true || validationVerifAddress != true || validationVerifCity != true || validationVerifEmail != true || validationLocalStore != true) {
-    alert("La commande ne peut pas être validée")
+    alert("La commande ne peut pas être validée : Le panier ne doit pas être vide et/ou le formulaire doit être correctement complété")
   } else {
     let data = {
       contact: {
@@ -324,7 +328,7 @@ function validationFormulaire() {
     };
 
     localStorage.setItem('contact', JSON.stringify(data));
-      
+
     fetch("http://localhost:3000/api/products/order", {
       method: "POST",
       headers: {
@@ -332,19 +336,17 @@ function validationFormulaire() {
       },
       body: JSON.stringify(data),
     })
-    .then((response) => response.json())
-    .then((serveur) => {
-      orderId = serveur,
-      console.log(orderId)
-      location.href = "confirmation.html?id=" + orderId.orderId;
-    })
-    .catch((error) => {
-      console.log(error)
-      alert("Erreur technique")
-    });
+      .then((response) => response.json())
+      .then((serveur) => {
+        orderId = serveur,
+          location.href = "confirmation.html?id=" + orderId.orderId;
+      })
+      .catch((error) => {
+        alert("Erreur technique" + error)
+      });
   }
 };
-  
+
 //gestion du bouton commander
 const monFormulaire = document.getElementById("order");
 monFormulaire.addEventListener("click", (event) => {
